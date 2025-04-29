@@ -1,0 +1,75 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <functional>
+using namespace std;
+
+vector<vector<int>> get_graph(int node_num, int edge_num) {
+	vector<vector<int>> graph;
+	graph.resize(node_num);
+	for (int i = 0; i < edge_num; i++) {
+		int src, tar;
+		cin >> src >> tar;
+		graph[tar - 1].push_back(src - 1);
+	}
+	return graph;
+}
+
+vector<int> get_in_degree(const vector<vector<int>> &graph) {
+	int num = graph.size();
+	vector<int> in_degree(num, 0);
+	for (int i = 0; i < num; i++) {
+		for (int j : graph[i]) {
+			in_degree[j]++;
+		}
+	}
+	return in_degree;
+}
+
+void topologicalSort(const vector<vector<int>> &graph) {
+	vector<int> in_degree = get_in_degree(graph);
+	int num = graph.size();
+	priority_queue<int, vector<int>> minHeap;
+	vector<int> topoorder;
+	
+	for (int i = 0; i < num; i++) {
+		if (in_degree[i] == 0) {
+			minHeap.push(i);
+		}
+	}
+	
+	while (!minHeap.empty()) {
+		int u = minHeap.top();
+		minHeap.pop();
+		topoorder.push_back(u);
+		for (int v : graph[u]) {
+			in_degree[v]--;
+			if (in_degree[v] == 0) {
+				minHeap.push(v);
+			}
+		}
+	}
+	
+	if (topoorder.size() != num) {
+		cout << "Impossible!" << endl;
+		return;
+	}
+	
+	for(int j=topoorder.size()-1;j>=0;j--){
+		cout<<topoorder[j]+1<<" ";
+	}
+	cout << endl;
+}
+
+int main(){
+	int n;
+	cin >> n;
+	for (int i = 0; i < n; i++){
+		int node_num, edge_num;
+		cin >> node_num >> edge_num;
+		vector<vector<int>> graph = get_graph(node_num, edge_num);
+		topologicalSort(graph);
+	}
+	return 0;
+}
+
